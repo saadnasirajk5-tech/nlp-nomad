@@ -34,9 +34,32 @@ class SelfAttentionLayer:
         # Taking the transpose of keys to align dimensions for matrix multiplication 
         scores = np.dot(queries, keys.T) 
         print(scores) 
-        # If score is high its means they are highly related 
+        # If score is high its means they are highly related
+        ## Scaling the scores  
+        # Getting the dimensionality of the query vector 
+        d_k = queries.shape[1] 
+        scaled_scores = scores / np.sqrt(d_k) 
+        # Appling softmax  
+        attention_weights = softmax(scaled_scores) 
+        print("Attention Weights") 
+        print(np.round(attention_weights, 2)) 
         
+        # weighted sum of values 
+        """Multiplying the probability map with actual content"""
+        output = np.dot(attention_weights, values) 
+        return attention_weights, values     
     
+    
+########## RUNNING THE STIMULATION ##########
+if __name__ == "__main__": 
+    input_sentence_embeddings = np.array([
+         [1.0, 0.0, 1.0, 0.0],
+         [0.0, 1.0, 0.0, 1.0], 
+         [1.0, 1.0, 0.0, 0.0]  
+    ])
 
-
-
+print(f"Input Shape: {input_sentence_embeddings.shape}") 
+attention_layer = SelfAttentionLayer(embed_dim=4, d_model=3) 
+# Running the pass 
+contextualized_embeddings, weights = attention_layer.forward(input_sentence_embeddings)
+print(contextualized_embeddings) 
