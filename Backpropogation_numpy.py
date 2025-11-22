@@ -1,72 +1,68 @@
-import numpy as np   
+import numpy as np   # Import numpy library for numerical operations
 
-# It's the XOR problem   
-X = np.array([[0,0], 
-              [0,1],
-              [1,0],
-              [1,1]])   
-y = np.array([[0],[1],[1],[0]])
+# It's the XOR problem   # Define input data for XOR logic gate
+X = np.array([[0,0],  # Input pair 1
+              [0,1],  # Input pair 2
+              [1,0],  # Input pair 3
+              [1,1]])  # Input pair 4
 
-np.random.seed(42) 
+y = np.array([[0],[1],[1],[0]])  # Expected output for XOR inputs
 
-input_size = 2 
-hidden_size = 4 
-output_size = 1 
-learning_rate = 0.1 
+np.random.seed(42)  # Set random seed for reproducibility
 
-# Weights and Biases 
-W1 = np.random.randn(input_size, hidden_size) 
-b1 = np.zeros((1, hidden_size)) 
+input_size = 2  # Number of input neurons
+hidden_size = 4  # Number of neurons in hidden layer
+output_size = 1  # Number of output neurons
+learning_rate = 0.1  # Learning rate for weight updates
 
-W2 = np.random.randn(hidden_size, output_size)
-b2 = np.zeros((1, output_size))
+# Initialize weights and biases
+W1 = np.random.randn(input_size, hidden_size)  # Weights from input to hidden layer
+b1 = np.zeros((1, hidden_size))  # Biases for hidden layer
 
-# Activation Function 
-def sigmoid(x): 
-    return 1/ (1 + np.exp(-x)) 
+W2 = np.random.randn(hidden_size, output_size)  # Weights from hidden to output layer
+b2 = np.zeros((1, output_size))  # Biases for output layer
 
-def sigmoid_derivative(x): 
-    return x * (1-x) 
+# Activation function: sigmoid
+def sigmoid(x):  # Sigmoid activation function
+    return 1 / (1 + np.exp(-x))  # Calculate sigmoid
 
-print("Start training")
+# Derivative of sigmoid function
+def sigmoid_derivative(x):  # Derivative for backpropagation
+    return x * (1 - x)  # Derivative formula
 
-for epoch in range(10000): 
+print("Start training")  # Indicate training start
+
+for epoch in range(10000):  # Training loop for 10000 iterations
     # --- FORWARD PASS ---
-    # Hidden layer 
-    z1 = np.dot(X, W1) + b1   
-    a1 = sigmoid(z1)   
-    # Output layer 
-    z2 = np.dot(a1, W2) + b2 
-    output = sigmoid(z2)   
-    
+    # Calculate hidden layer input
+    z1 = np.dot(X, W1) + b1  # Weighted sum plus bias
+    a1 = sigmoid(z1)  # Activation output of hidden layer
+    # Calculate output layer input
+    z2 = np.dot(a1, W2) + b2  # Weighted sum plus bias
+    output = sigmoid(z2)  # Activation output of output layer
+
     # --- BACKPROPAGATION ---
-    # 1. Output Layer Error
-    error = y - output 
-    d_output = error * sigmoid_derivative(output)
-    
-    # 2. Hidden Layer Error
-    # We take error from output and bring it back through W2
-    error_hidden_layer = d_output.dot(W2.T)    
-    d_hidden_layer = error_hidden_layer * sigmoid_derivative(a1) 
-    
+    # Calculate error at output
+    error = y - output  # Difference between expected and predicted
+    d_output = error * sigmoid_derivative(output)  # Delta for output layer
+
+    # Calculate error for hidden layer
+    error_hidden_layer = d_output.dot(W2.T)  # Propagate error back
+    d_hidden_layer = error_hidden_layer * sigmoid_derivative(a1)  # Delta for hidden layer
+
     # --- OPTIMIZATION ---
-    
-    # Updating Output Layer (W2, b2) using d_output
-    # We need a1.T here because a1 was the input to this layer
-    W2 += a1.T.dot(d_output) * learning_rate 
-    b2 += np.sum(d_output, axis=0, keepdims=True) * learning_rate
+    # Update weights and biases for output layer
+    W2 += a1.T.dot(d_output) * learning_rate  # Adjust weights
+    b2 += np.sum(d_output, axis=0, keepdims=True) * learning_rate  # Adjust biases
 
-    # Updating Hidden Layer (W1, b1) using d_hidden_layer
-    # We need X.T here because X was the input to this layer
-    W1 += X.T.dot(d_hidden_layer) * learning_rate
-    b1 += np.sum(d_hidden_layer, axis=0, keepdims=True) * learning_rate
+    # Update weights and biases for hidden layer
+    W1 += X.T.dot(d_hidden_layer) * learning_rate  # Adjust weights
+    b1 += np.sum(d_hidden_layer, axis=0, keepdims=True) * learning_rate  # Adjust biases
 
-    if epoch % 1000 == 0:
-        loss = np.mean(np.square(y - output)) 
-        print(f"Epoch {epoch}: Loss {loss:.5f}")
+    if epoch % 1000 == 0:  # Every 1000 epochs
+        loss = np.mean(np.square(y - output))  # Calculate mean squared error
+        print(f"Epoch {epoch}: Loss {loss:.5f}")  # Print loss
 
 # TESTING
-print("\nFinal Predictions:")
-print(output.round())
-
-
+print("\nFinal Predictions:")  # Print final prediction message
+print(output.round())  # Print rounded output predictions
